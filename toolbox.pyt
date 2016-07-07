@@ -1,3 +1,4 @@
+from calculate_summary import calculate_summary_field
 import arcpy
 
 
@@ -63,8 +64,20 @@ class CalculateSummary(object):
         param3 = new_field_parameter('Average (Per Capita) Sales Field', 'average_field')
         param4 = new_field_parameter('Average (Per Capita) - Mean (Average) Field', 'average_mean_field')
 
+        # create input field parameter for text summary field
+        param5 = arcpy.Parameter(
+            displayName='Output Summary Field',
+            name='summary_field',
+            datatype='Field',
+            parameterType='Required',
+            direction='Input',
+            enabled=False
+        )
+        param5.parameterDependencies = [param0.name]
+        param5.filter.list = ['Text']
+
         # create a list of the parameters and return the result
-        params = [param0, param1, param2, param3, param4]
+        params = [param0, param1, param2, param3, param4, param5]
         return params
 
     def isLicensed(self):
@@ -78,11 +91,13 @@ class CalculateSummary(object):
 
         # if the input feature layer parameter has been changed and a value is entered
         if parameters[0].altered and parameters[0].value:
+
             # enable all the field input fields
             parameters[1].enabled = True
             parameters[2].enabled = True
             parameters[3].enabled = True
             parameters[4].enabled = True
+            parameters[5].enabled = True
 
         return
 
@@ -95,26 +110,38 @@ class CalculateSummary(object):
 
         if (parameters[1].valueAsText == parameters[2].valueAsText or
                     parameters[1].valueAsText == parameters[3].valueAsText or
-                    parameters[1].valueAsText == parameters[4].valueAsText):
+                    parameters[1].valueAsText == parameters[4].valueAsText or
+                    parameters[1].valueAsText == parameters[5].valueAsText):
             parameters[1].setErrorMessage(message_fields_equal)
 
         if (parameters[2].valueAsText == parameters[1].valueAsText or
                     parameters[2].valueAsText == parameters[3].valueAsText or
-                    parameters[2].valueAsText == parameters[4].valueAsText):
+                    parameters[2].valueAsText == parameters[4].valueAsText or
+                    parameters[2].valueAsText == parameters[5].valueAsText):
             parameters[2].setErrorMessage(message_fields_equal)
 
         if (parameters[3].valueAsText == parameters[1].valueAsText or
                     parameters[3].valueAsText == parameters[2].valueAsText or
-                    parameters[3].valueAsText == parameters[4].valueAsText):
+                    parameters[3].valueAsText == parameters[4].valueAsText or
+                    parameters[3].valueAsText == parameters[5].valueAsText):
             parameters[3].setErrorMessage(message_fields_equal)
 
         if (parameters[4].valueAsText == parameters[1].valueAsText or
                     parameters[4].valueAsText == parameters[2].valueAsText or
-                    parameters[4].valueAsText == parameters[3].valueAsText):
+                    parameters[4].valueAsText == parameters[3].valueAsText or
+                    parameters[4].valueAsText == parameters[5].valueAsText):
             parameters[4].setErrorMessage(message_fields_equal)
+
+        if (parameters[5].valueAsText == parameters[1].valueAsText or
+                    parameters[5].valueAsText == parameters[2].valueAsText or
+                    parameters[5].valueAsText == parameters[3].valueAsText or
+                    parameters[5].valueAsText == parameters[4].valueAsText):
+            parameters[5].setErrorMessage(message_fields_equal)
+
+
 
         return
 
     def execute(self, parameters, messages):
         """The source code of the tool."""
-        return
+        calculate_summary_field(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5])
