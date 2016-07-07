@@ -7,6 +7,7 @@ author:     Joel McCune
 import math
 import arcpy
 
+
 def get_summary_qualifier_by_standard_deviation(standard_deviation):
     """
     Get the summary value based on the input range the standard deviation value falls into.
