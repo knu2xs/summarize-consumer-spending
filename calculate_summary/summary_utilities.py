@@ -127,8 +127,13 @@ def calculate_summary_field(input_table, gross_value_field, gross_standard_devia
     :return:
     """
     # save a field list to work from
-    field_list = [gross_value_field, gross_standard_deviation_field, average_value_field,
-                  average_standard_deviation_field, summary_field]
+    field_list = [gross_value_field, average_value_field, summary_field]
+
+    gross_value_list = [r[0] for r in arcpy.da.SearchCursor(input_table, gross_value_field)]
+    average_value_list = [r[0] for r in arcpy.da.SearchCursor(input_table, average_value_field)]
+
+    gross_standard_deviation = math.stdev(gross_value_list)
+    average_standard_deviation = math.stdev(average_value_list)
 
     # create an update cursor to manipulate the table
     with arcpy.da.UpdateCursor(input_table, field_list) as update_cursor:
@@ -137,7 +142,7 @@ def calculate_summary_field(input_table, gross_value_field, gross_standard_devia
         for row in update_cursor:
 
             # get the full summary
-            row[4] = get_full_summary(row[0], row[1], row[2], row[3])
+            row[2] = get_full_summary(row[0], gross_standard_deviation, row[1], average_standard_deviation)
 
             # push the update
             update_cursor.updateRow(row)

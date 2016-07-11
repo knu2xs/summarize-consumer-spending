@@ -60,9 +60,9 @@ class CalculateSummary(object):
 
         # create the four input field parameters
         param1 = new_field_parameter('Gross Sales Field', 'gross_field')
-        param2 = new_field_parameter('Gross Sales - Mean (Average) Field', 'gross_mean_field')
+        param2 = new_field_parameter('Gross Sales Standard Deviation Field', 'gross_stddev_field')
         param3 = new_field_parameter('Average (Per Capita) Sales Field', 'average_field')
-        param4 = new_field_parameter('Average (Per Capita) - Mean (Average) Field', 'average_mean_field')
+        param4 = new_field_parameter('Average (Per Capita) Sales Standard Deviation Field', 'average_stddev_field')
 
         # create input field parameter for text summary field
         param5 = arcpy.Parameter(
@@ -137,8 +137,6 @@ class CalculateSummary(object):
                     parameters[5].valueAsText == parameters[3].valueAsText or
                     parameters[5].valueAsText == parameters[4].valueAsText):
             parameters[5].setErrorMessage(message_fields_equal)
-
-
 
         return
 
