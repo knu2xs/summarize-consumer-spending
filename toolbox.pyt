@@ -60,12 +60,10 @@ class CalculateSummary(object):
 
         # create the four input field parameters
         param1 = new_field_parameter('Gross Sales Field', 'gross_field')
-        param2 = new_field_parameter('Gross Sales Standard Deviation Field', 'gross_stddev_field')
-        param3 = new_field_parameter('Average (Per Capita) Sales Field', 'average_field')
-        param4 = new_field_parameter('Average (Per Capita) Sales Standard Deviation Field', 'average_stddev_field')
+        param2 = new_field_parameter('Average (Per Capita) Sales Field', 'average_field')
 
         # create input field parameter for text summary field
-        param5 = arcpy.Parameter(
+        param3 = arcpy.Parameter(
             displayName='Output Summary Field',
             name='summary_field',
             datatype='Field',
@@ -73,11 +71,11 @@ class CalculateSummary(object):
             direction='Input',
             enabled=False
         )
-        param5.parameterDependencies = [param0.name]
-        param5.filter.list = ['Text']
+        param3.parameterDependencies = [param0.name]
+        param3.filter.list = ['Text']
 
         # create a list of the parameters and return the result
-        params = [param0, param1, param2, param3, param4, param5]
+        params = [param0, param1, param2, param3]
         return params
 
     def isLicensed(self):
@@ -96,8 +94,6 @@ class CalculateSummary(object):
             parameters[1].enabled = True
             parameters[2].enabled = True
             parameters[3].enabled = True
-            parameters[4].enabled = True
-            parameters[5].enabled = True
 
         return
 
@@ -109,37 +105,19 @@ class CalculateSummary(object):
         message_fields_equal = 'Unique fields must be used for each field parameter. Two of the field input parameters cannot be the same.'
 
         if (parameters[1].valueAsText == parameters[2].valueAsText or
-                    parameters[1].valueAsText == parameters[3].valueAsText or
-                    parameters[1].valueAsText == parameters[4].valueAsText or
-                    parameters[1].valueAsText == parameters[5].valueAsText):
+                    parameters[1].valueAsText == parameters[3].valueAsText):
             parameters[1].setErrorMessage(message_fields_equal)
 
         if (parameters[2].valueAsText == parameters[1].valueAsText or
-                    parameters[2].valueAsText == parameters[3].valueAsText or
-                    parameters[2].valueAsText == parameters[4].valueAsText or
-                    parameters[2].valueAsText == parameters[5].valueAsText):
+                    parameters[2].valueAsText == parameters[3].valueAsText):
             parameters[2].setErrorMessage(message_fields_equal)
 
         if (parameters[3].valueAsText == parameters[1].valueAsText or
-                    parameters[3].valueAsText == parameters[2].valueAsText or
-                    parameters[3].valueAsText == parameters[4].valueAsText or
-                    parameters[3].valueAsText == parameters[5].valueAsText):
+                    parameters[3].valueAsText == parameters[2].valueAsText):
             parameters[3].setErrorMessage(message_fields_equal)
-
-        if (parameters[4].valueAsText == parameters[1].valueAsText or
-                    parameters[4].valueAsText == parameters[2].valueAsText or
-                    parameters[4].valueAsText == parameters[3].valueAsText or
-                    parameters[4].valueAsText == parameters[5].valueAsText):
-            parameters[4].setErrorMessage(message_fields_equal)
-
-        if (parameters[5].valueAsText == parameters[1].valueAsText or
-                    parameters[5].valueAsText == parameters[2].valueAsText or
-                    parameters[5].valueAsText == parameters[3].valueAsText or
-                    parameters[5].valueAsText == parameters[4].valueAsText):
-            parameters[5].setErrorMessage(message_fields_equal)
 
         return
 
     def execute(self, parameters, messages):
         """The source code of the tool."""
-        calculate_summary_field(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5])
+        calculate_summary_field(parameters[0], parameters[1], parameters[2], parameters[3])

@@ -114,29 +114,34 @@ def get_full_summary(gross_value, gross_standard_deviation, average_value, avera
     return ' '.join(summary_list)
 
 
-def calculate_summary_field(input_table, gross_value_field, gross_standard_deviation_field, average_value_field,
-                            average_standard_deviation_field, summary_field):
+def calculate_summary_field(input_table, gross_value_field, average_value_field, summary_field):
     """
     Calculate the full summary based on a value and standard deviations for both gross and per capita revenue.
     :param input_table:
     :param gross_value_field:
-    :param gross_standard_deviation_field:
     :param average_value_field:
-    :param average_standard_deviation_field:
     :param summary_field:
     :return:
     """
-    # save a field list to work from
-    field_list = [gross_value_field, average_value_field, summary_field]
+    # if the summary field does not already exist
+    if not len(arcpy.ListFields(input_table, summary_field)):
 
-    gross_value_list = [r[0] for r in arcpy.da.SearchCursor(input_table, gross_value_field)]
-    average_value_list = [r[0] for r in arcpy.da.SearchCursor(input_table, average_value_field)]
+        # create the summary field
+        arcpy.AddField_management(
+            in_table=input_table,
+            field_name=summary_field,
+            field_alias='Summary',
+            field_type='TEXT',
+            field_length=2500
+        )
 
-    gross_standard_deviation = math.stdev(gross_value_list)
-    average_standard_deviation = math.stdev(average_value_list)
+    # calculate the respective standard deviations
+    value_list = [r for r in arcpy.da.SearchCursor(input_table, (gross_value_field, average_value_field))]
+    gross_standard_deviation = math.stdev([value[0] for value in value_list])
+    average_standard_deviation = math.stdev(value[1] for value in value_list)
 
     # create an update cursor to manipulate the table
-    with arcpy.da.UpdateCursor(input_table, field_list) as update_cursor:
+    with arcpy.da.UpdateCursor(input_table, [gross_value_field, average_value_field, summary_field]) as update_cursor:
 
         # iterate the rows
         for row in update_cursor:
